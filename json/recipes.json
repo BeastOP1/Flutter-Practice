@@ -1,0 +1,121 @@
+{
+  "recipes": [
+    {
+      "id": 1,
+      "name": "Mexican Pizza",
+      "category": "Dinner",
+      "calories": 140,
+      "image": "https://firebasestorage.googleapis.com/v0/b/flutter-complete-app-189f6.appspot.com/o/images%2Fmexican-pizza.jpg?alt=media&token=79f5a4aa-6787-4d78-9824-40a858035144",
+      "ingredients": [
+        {
+          "name": "Beef",
+          "amount": 100,
+          "unit": "g",
+          "image": "https://www.kwajahman.co.uk/cdn/shop/products/StewingBeef.jpg?v=1617380238"
+        },
+        {
+          "name": "Tomato",
+          "amount": 50,
+          "unit": "g",
+          "image": "https://www.thedailymeal.com/img/gallery/if-you-want-to-finely-dice-a-tomato-one-variety-works-best/intro-1708025195.jpg"
+        },
+        {
+          "name": "Pizza Base",
+          "amount": 200,
+          "unit": "g",
+          "image": "https://www.bolefoods.co.za/wp-content/uploads/2023/07/Pizza-Bases.png"
+        },
+        {
+          "name": "Cheese",
+          "amount": 100,
+          "unit": "g",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGx7W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8Kx8W5h7yQ8"
+        }
+      ],
+      "instructions": [
+        "Preheat oven to 200°C",
+        "Spread sauce on pizza base",
+        "Add cheese and toppings",
+        "Bake for 15-20 minutes",
+        "Serve hot"
+      ],
+      "prepTime": 15,
+      "cookTime": 20,
+      "servings": 2
+    },
+    {
+      "id": 2,
+      "name": "Chicken Biryani",
+      "category": "Lunch",
+      "calories": 350,
+      "image": "https://firebasestorage.googleapis.com/v0/b/flutter-complete-app-189f6.appspot.com/o/images%2Fchicken-biryani.jpg?alt=media&token=abc123",
+      "ingredients": [
+        {
+          "name": "Chicken",
+          "amount": 500,
+          "unit": "g",
+          "image": "https://www.meatpoultry.com/ext/resources/2022/05/Chicken-breasts.jpg"
+        },
+        {
+          "name": "Rice",
+          "amount": 300,
+          "unit": "g",
+          "image": "https://www.healthifyme.com/blog/wp-content/uploads/2022/02/shutterstock_521551907-1.jpg"
+        },
+        {
+          "name": "Yogurt",
+          "amount": 200,
+          "unit": "ml",
+          "image": "https://cdn.britannica.com/08/177308-050-94D9CF6E/Yogurt.jpg"
+        }
+      ],
+      "instructions": [
+        "Marinate chicken with yogurt and spices",
+        "Cook rice until 70% done",
+        "Layer chicken and rice in pot",
+        "Cook on low flame for 20 minutes",
+        "Garnish with fried onions"
+      ],
+      "prepTime": 30,
+      "cookTime": 45,
+      "servings": 4
+    },
+    {
+      "id": 3,
+      "name": "Oatmeal Breakfast Bowl",
+      "category": "Breakfast",
+      "calories": 120,
+      "image": "https://firebasestorage.googleapis.com/v0/b/flutter-complete-app-189f6.appspot.com/o/images%2Foatmeal-bowl.jpg?alt=media&token=def456",
+      "ingredients": [
+        {
+          "name": "Oats",
+          "amount": 50,
+          "unit": "g",
+          "image": "https://images.immediate.co.uk/production/volatile/sites/30/2020/02/Oats-c48c27c.jpg"
+        },
+        {
+          "name": "Banana",
+          "amount": 1,
+          "unit": "piece",
+          "image": "https://cdn.britannica.com/67/19367-050-8C85B9B9/Banana.jpg"
+        },
+        {
+          "name": "Honey",
+          "amount": 15,
+          "unit": "ml",
+          "image": "https://www.eatthis.com/wp-content/uploads/sites/4/2021/06/honey.jpg"
+        }
+      ],
+      "instructions": [
+        "Cook oats with milk or water",
+        "Slice banana on top",
+        "Drizzle with honey",
+        "Add nuts if desired",
+        "Serve warm"
+      ],
+      "prepTime": 5,
+      "cookTime": 10,
+      "servings": 1
+    }
+  ]
+}
