@@ -7,7 +7,7 @@ import 'package:flutter_learn/start.dart';
 import 'assignment2/main.dart';
 
 void main() {
-   runApp(  Start());
+   // runApp(  Start());
   // runApp(  Assignment2Start());
   // runApp(  MyAppStart());
 }
