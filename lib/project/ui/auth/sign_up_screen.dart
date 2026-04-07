@@ -20,12 +20,14 @@ class _SignupScreenState extends State<SignupScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            Text(
-              "Welcome Back!",
-              style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold
+            Container(
+              child: Text(
+                "Welcome Back!",
+                style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
               ),
+              padding: EdgeInsetsGeometry.only(left: 18),
+              alignment: Alignment.bottomLeft,
+              height: 160,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -65,7 +67,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       onPressed: () {
                         Navigator.pushNamed(context, '/home');
-
                       },
                       child: const Text(
                         "Sign Up",
@@ -103,7 +104,6 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildHeader() {
-
     return Container(
       height: 0, // Zero height
       child: OverflowBox(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learn/project/navigation/wrapper/home_wrapper.dart';
 import 'package:flutter_learn/project/ui/auth/log_in_screen.dart';
 import 'package:flutter_learn/project/ui/auth/sign_up_screen.dart';
 import 'package:flutter_learn/project/ui/home/HomeScreen.dart';
@@ -31,7 +32,7 @@ class Startup extends StatelessWidget{
         "/onBoard": (context)=> OnboardingScreen(),
         "/login" :(context)=> LoginScreen(),
         "/sign_up" :(context)=> SignupScreen(),
-        "/home" :(context)=> HomeScreen(),
+        "/home" :(context)=> HomeWrapperEnhanced(),
       },
 
     );

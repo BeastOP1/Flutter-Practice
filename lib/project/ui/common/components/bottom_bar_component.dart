@@ -23,7 +23,7 @@ class LMSNavBar extends StatefulWidget {
     this.inactiveIconColor = const Color(0xFF5F6368),
     this.activeLabelColor = const Color(0xFFFFFFFF),
     this.inactiveLabelColor = const Color(0xFFFFFFFF),
-    this.height = 70,
+    this.height = 70
   });
 
   @override

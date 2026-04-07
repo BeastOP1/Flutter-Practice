@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learn/project/ui/common/components/icon_button.dart';
 import 'package:flutter_learn/project/utils/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -44,34 +45,7 @@ class LMSAppBar extends StatelessWidget {
         ],
       ),
       actions: [
-        GestureDetector(
-          onTap: onBackPress,
-          child: Container(
-            margin: EdgeInsetsDirectional.only(end: 16),
-            height: 50,
-            width: 50,
-            padding: EdgeInsetsDirectional.all(8),
-            decoration: BoxDecoration(
-              color: Color(0xFFF4F4F4),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xFFF4F4F4),
-                  spreadRadius: 10,
-                  blurRadius: 1,
-                  blurStyle: BlurStyle.outer,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: SvgPicture.asset(
-              "assets/ic_notification.svg",
-              width: 10,
-              height: 10,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
+        CustomIconButton( onBackPress: () {  }, marginEnd: true, ),
       ],
       leading: CircleAvatar(
         backgroundColor: Colors.transparent,
