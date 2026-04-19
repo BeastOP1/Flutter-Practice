@@ -1,8 +1,5 @@
-
-
-
 import 'package:flutter/material.dart';
-
+import '../common/components/icon_button.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -15,23 +12,16 @@ class _ResultScreenState extends State<ResultScreen> {
   String _selectedSemester = 'Semester';
 
   static const List<Color> _cardColors = [
-    Color(0xFF8B3A8F), // purple
-    Color(0xFF6B3FA0), // violet
-    Color(0xFF1A2550), // navy
-    Color(0xFFB5860D), // golden
-    Color(0xFF4A8080), // teal
-    Color(0xFFB84B1A), // burnt orange
-    Color(0xFF556B2F), // olive
-    Color(0xFF1A7A5E), // emerald
-    Color(0xFF7A3030), // burgundy
-    Color(0xFF2D5F8A), // steel blue
+    Color(0xFF8B3A8F), Color(0xFF6B3FA0), Color(0xFF1A2550),
+    Color(0xFFB5860D), Color(0xFF4A8080), Color(0xFFB84B1A),
+    Color(0xFF556B2F), Color(0xFF1A7A5E), Color(0xFF7A3030),
+    Color(0xFF2D5F8A),
   ];
 
   static final List<Map<String, String>> _results = List.filled(
     10,
     const {
-      'code':
-      'CPR601260-S24-PB-GCL-BSSEM-SPRING 2024-2028-BSSE-S24-1A-LAB-PROGRAMMING FUNDAMENTALS (LAB)',
+      'code': 'CPR601260-S24-PB-GCL-BSSEM-SPRING 2024-2028-BSSE-S24-1A-LAB-PROGRAMMING FUNDAMENTALS (LAB)',
       'title': 'PROGRAMMING FUNDAMENTALS (LAB)',
       'faculty': 'Faculty of Computer Science and Information Technology-GCL',
       'instructor': 'Hafiz Asad Ali -428888',
@@ -41,7 +31,6 @@ class _ResultScreenState extends State<ResultScreen> {
     },
   );
 
-  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +52,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         color: Color(0xFF1A1A2E)),
                   ),
                   const Spacer(),
-                  _notificationBell(),
+                  _buildNotificationWithBadge(), // Profile screen style bell
                 ],
               ),
             ),
@@ -102,41 +91,28 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  // ── Notification bell ────────────────────────
-  Widget _notificationBell() {
+  // ── Profile Screen Style Bell ────────────────
+  Widget _buildNotificationWithBadge() {
     return Stack(
-      clipBehavior: Clip.none,
       children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4))
-            ],
-          ),
-          child: const Icon(Icons.notifications_none_rounded,
-              color: Color(0xFF555566), size: 22),
-        ),
+        const CustomIconButton(marginEnd: false),
         Positioned(
-          top: -2,
-          right: -2,
+          right: 4,
+          top: 0,
           child: Container(
-            width: 18,
-            height: 18,
-            decoration:
-            const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: const Text('3',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold)),
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            child: const Text(
+              "3",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],
@@ -160,49 +136,38 @@ class _ResultScreenState extends State<ResultScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // semester dropdown
           Align(
             alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0E8F5),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _selectedSemester,
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF8B3A8F)),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: Color(0xFF8B3A8F), size: 18),
-                  ],
-                ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0E8F5),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _selectedSemester,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF8B3A8F)),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.keyboard_arrow_down_rounded,
+                      color: Color(0xFF8B3A8F), size: 18),
+                ],
               ),
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // CGPA
           _progressRow(
             label: 'Overall CGPA',
             value: '2.0/4.0',
             progress: 2.0 / 4.0,
           ),
-
           const SizedBox(height: 14),
-
-          // Credits
           _progressRow(
             label: 'Credits Earned',
             value: '28/50',
@@ -251,7 +216,7 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  // ── Result card ──────────────────────────────
+  // ── Result card (Format Wapas Sahi Kar Diya) ──
   Widget _resultCard(Map<String, String> data, Color color) {
     return Container(
       decoration: BoxDecoration(
@@ -269,7 +234,6 @@ class _ResultScreenState extends State<ResultScreen> {
         borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
-            // ── subtle background image overlay (textbook pattern)
             Positioned.fill(
               child: Opacity(
                 opacity: 0.18,
@@ -280,8 +244,6 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ),
             ),
-
-            // ── dark gradient overlay
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -296,14 +258,11 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ),
             ),
-
-            // ── content
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // course code (small)
                   Text(
                     data['code']!,
                     maxLines: 2,
@@ -352,7 +311,6 @@ class _ResultScreenState extends State<ResultScreen> {
                     ),
                   ),
                   const Spacer(),
-                  // Result badge
                   Align(
                     alignment: Alignment.centerRight,
                     child: Container(

@@ -2,6 +2,12 @@
 import 'package:flutter/material.dart';
 
 import '../common/components/icon_button.dart';
+import 'package:flutter_learn/project/ui/editprofile/EditProfileScreen.dart';
+import 'package:flutter_learn/project/ui/changepassword/ChangePasswordScreen.dart';
+import 'package:flutter_learn/project/ui/notificationdetail/NotificationScreen.dart';
+import 'package:flutter_learn/project/ui/auth/log_in_screen.dart';
+import 'package:flutter_learn/project/ui/help&support/SupportScreen.dart';
+
 
 
 
@@ -107,7 +113,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       _sectionLabel('Academic Info'),
                       const SizedBox(height: 10),
                       _infoCard(children: [
-                        _infoRow(Icons.badge_outlined, 'Roll Number', 'su92-bssem-s24-099', _primary),
+                        _infoRow(Icons.badge_outlined,
+                            'Roll Number', 'su92-bssem-s24-099', _primary),
                         _divider(),
                         _infoRow(Icons.school_outlined, 'Batch',
                             _batch, _accent),
@@ -163,26 +170,10 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
               child: Stack(
                 children: [
-                  // decorative circles
-                  Positioned(
-                    top: -30,
-                    right: -30,
-                    child: _decorCircle(140, Colors.white.withOpacity(0.07)),
-                  ),
-                  Positioned(
-                    top: 50,
-                    right: 60,
-                    child: _decorCircle(60, Colors.white.withOpacity(0.06)),
-                  ),
-                  Positioned(
-                    bottom: 30,
-                    left: -20,
-                    child: _decorCircle(100, _accent.withOpacity(0.15)),
-                  ),
-                  // dot grid pattern
-                  Positioned.fill(
-                    child: CustomPaint(painter: _DotGridPainter()),
-                  ),
+                  Positioned(top: -30, right: -30, child: _decorCircle(140, Colors.white.withOpacity(0.07))),
+                  Positioned(top: 50, right: 60, child: _decorCircle(60, Colors.white.withOpacity(0.06))),
+                  Positioned(bottom: 30, left: -20, child: _decorCircle(100, _accent.withOpacity(0.15))),
+                  Positioned.fill(child: CustomPaint(painter: _DotGridPainter())),
                 ],
               ),
             ),
@@ -194,24 +185,14 @@ class _ProfileScreenState extends State<ProfileScreen>
             right: 20,
             child: Stack(
               children: [
-                CustomIconButton(onBackPress: () {},marginEnd: false,),
+                const CustomIconButton(marginEnd: false),
                 Positioned(
                   right: 4,
                   top: 0,
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      "3",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    child: const Text("3", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -224,124 +205,70 @@ class _ProfileScreenState extends State<ProfileScreen>
             left: 0,
             right: 0,
             child: const Center(
-              child: Text(
-                'Profile',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                  letterSpacing: 0.3,
-                ),
-              ),
+              child: Text('Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white, letterSpacing: 0.3)),
             ),
           ),
 
-          // ── avatar card (overlapping)
+          // ── AVATAR SECTION (Wrapped with Navigation)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Column(
               children: [
-                // avatar with ring
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // outer glow ring
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const SweepGradient(
-                          colors: [
-                            Color(0xFF8B3A8F),
-                            Color(0xFFB5860D),
-                            Color(0xFF8B3A8F),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _primary.withOpacity(0.4),
-                            blurRadius: 20,
-                            spreadRadius: 2,
-                          )
-                        ],
-                      ),
-                    ),
-                    // white border
-                    Container(
-                      width: 90,
-                      height: 90,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    // avatar
-                    Container(
-                      width: 84,
-                      height: 84,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _primary.withOpacity(0.15),
-                      ),
-                      child: ClipOval(
-                        child: Icon(Icons.person_rounded,
-                            size: 52, color: _primary),
-                      ),
-                    ),
-                    // edit button
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 26,
-                        height: 26,
+                GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen())),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 96,
+                        height: 96,
                         decoration: BoxDecoration(
-                          color: _accent,
                           shape: BoxShape.circle,
-                          border:
-                          Border.all(color: Colors.white, width: 2),
+                          gradient: const SweepGradient(colors: [Color(0xFF8B3A8F), Color(0xFFB5860D), Color(0xFF8B3A8F)]),
+                          boxShadow: [BoxShadow(color: _primary.withOpacity(0.4), blurRadius: 20, spreadRadius: 2)],
                         ),
-                        child: const Icon(Icons.edit_rounded,
-                            color: Colors.white, size: 13),
                       ),
-                    ),
-                  ],
+                      Container(
+                        width: 90,
+                        height: 90,
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      ),
+                      Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: _primary.withOpacity(0.15)),
+                        child: ClipOval(child: Icon(Icons.person_rounded, size: 52, color: _primary)),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: _accent,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Icon(Icons.edit_rounded, color: Colors.white, size: 13),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  _name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
-                  ),
-                ),
+                Text(_name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
                 const SizedBox(height: 4),
-                Text(
-                  _rollNo,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(_rollNo, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.apartment_rounded,
-                        size: 16, color: _primary),
+                    Icon(Icons.apartment_rounded, size: 16, color: _primary),
                     const SizedBox(width: 6),
-                    Text(
-                      _dept,
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: _primary,
-                          fontWeight: FontWeight.w600),
-                    ),
+                    Text(_dept, style: TextStyle(fontSize: 11, color: _primary, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
@@ -628,7 +555,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     ];
 
     return Container(
-      padding: EdgeInsetsGeometry.symmetric(vertical: 16,horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -641,7 +568,6 @@ class _ProfileScreenState extends State<ProfileScreen>
         ],
       ),
       child: Column(
-        spacing: 8,
         children: List.generate(items.length, (i) {
           final item = items[i];
           return Column(
@@ -661,17 +587,35 @@ class _ProfileScreenState extends State<ProfileScreen>
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: item.$3 == Colors.red
-                        ? Colors.red
-                        : const Color(0xFF1A1A2E),
+                    color: item.$3 == Colors.red ? Colors.red : const Color(0xFF1A1A2E),
                   ),
                 ),
                 trailing: item.$3 != Colors.red
-                    ? Icon(Icons.chevron_right_rounded,
-                    color: Colors.grey[300], size: 25)
+                    ? Icon(Icons.chevron_right_rounded, color: Colors.grey[300], size: 25)
                     : null,
                 dense: true,
-                onTap: () {},
+                onTap: () {
+                  // ── NAVIGATION LOGIC ──────────────────
+                  switch (item.$2) {
+                    case 'Notifications':
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen()));
+                      break;
+                    case 'Change Password':
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
+                      break;
+                    case 'Help & Support':
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SupportScreen()));
+                      break;
+                    case 'Logout':
+                    // Logout ke liye hum replace use karte hain taake user back na aa sakay
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                            (route) => false,
+                      );
+                      break;
+                  }
+                },
               ),
               if (i < items.length - 1)
                 Padding(

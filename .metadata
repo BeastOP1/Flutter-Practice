@@ -25,7 +25,7 @@ migration:
       create_revision: f6ff1529fd6d8af5f706051d9251ac9231c83407
       base_revision: f6ff1529fd6d8af5f706051d9251ac9231c83407
     - platform: macos
-      create_revision: f6ff1529fd6d8af5f706051d9251ac9231c83407
+      create_revision: f6ff1529fd6d8af5f706051d92191ac9231c83407
       base_revision: f6ff1529fd6d8af5f706051d9251ac9231c83407
     - platform: web
       create_revision: f6ff1529fd6d8af5f706051d9251ac9231c83407

@@ -1,32 +1,41 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../../../utils/app_colors.dart';
+import 'package:flutter_learn/project/ui/notificationdetail/NotificationScreen.dart';
 
 class CustomIconButton extends StatelessWidget {
-  final VoidCallback onBackPress;
-  final String iconRes;
+  final VoidCallback? onBackPress;
+  final String? iconRes;
   final bool marginEnd;
+  final IconData? iconData;
+
   const CustomIconButton({
     super.key,
-    required this.onBackPress,
-    this.iconRes = 'assets/ic_notification.svg',
-     this.marginEnd = false,
-
+    this.onBackPress,
+    this.iconRes,
+    this.iconData,
+    this.marginEnd = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onBackPress,
+      onTap: () {
+        if (onBackPress != null) {
+          onBackPress!();
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NotificationScreen()),
+          );
+        }
+      },
       child: Container(
-        margin: EdgeInsetsDirectional.only(end: marginEnd ? 16: 0),
+        margin: EdgeInsetsDirectional.only(end: marginEnd ? 16 : 0),
         height: 45,
         width: 45,
-        padding: EdgeInsetsDirectional.all(8),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(8),
+        decoration: const BoxDecoration(
           color: Color(0xFFF4F4F4),
           shape: BoxShape.circle,
           boxShadow: [
@@ -35,15 +44,22 @@ class CustomIconButton extends StatelessWidget {
               spreadRadius: 10,
               blurRadius: 1,
               blurStyle: BlurStyle.outer,
-              offset: const Offset(0, 1),
+              offset: Offset(0, 1),
             ),
           ],
         ),
-        child: SvgPicture.asset(
-          iconRes,
+
+        child: iconData != null
+            ? Icon(
+          iconData,
+          color: AppColors.primary,
+          size: 20,
+        )
+            : SvgPicture.asset(
+          iconRes ?? 'assets/ic_notification.svg',
           width: 9,
           height: 9,
-          color: AppColors.primary,
+          colorFilter: ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
         ),
       ),
     );

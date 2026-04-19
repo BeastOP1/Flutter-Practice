@@ -8,6 +8,7 @@ class LMSAppBar extends StatelessWidget {
   final VoidCallback? onBackPress;
   final VoidCallback? onMenuPress;
 
+
   const LMSAppBar({
     super.key,
     required this.userName,
@@ -45,7 +46,7 @@ class LMSAppBar extends StatelessWidget {
         ],
       ),
       actions: [
-        CustomIconButton( onBackPress: () {  }, marginEnd: true, ),
+        CustomIconButton( onBackPress: null, marginEnd: true, ),
       ],
       leading: CircleAvatar(
         backgroundColor: Colors.transparent,

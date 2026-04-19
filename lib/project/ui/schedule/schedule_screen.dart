@@ -79,7 +79,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   const Spacer(),
                   Stack(
                     children: [
-                      CustomIconButton(onBackPress: () {}),
+                      CustomIconButton(),
                       Positioned(
                         right: 4,
                         top: 0,

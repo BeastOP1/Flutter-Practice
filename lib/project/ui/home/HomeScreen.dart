@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_learn/project/ui/common/components/app_bar_component.dart';
 import 'package:flutter_learn/project/ui/common/components/bottom_bar_component.dart';
 import 'package:flutter_learn/project/ui/common/components/class_component.dart';
+import 'package:flutter_learn/project/ui/assignment/AssignmentUploadScreen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -142,71 +143,82 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _submitCard(String title, Color themeColor, bool start) {
-    return Container(
-      width: 155,
-      height: 135,
-      margin: EdgeInsets.only(right: 16, bottom: 16, left: start ? 16 : 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: themeColor.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-            spreadRadius: -2,
+    return GestureDetector(
+      onTap: () {
+        // Navigation Logic
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AssignmentUploadScreen(title: title),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: themeColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
+        );
+      },
+      child: Container(
+        width: 155,
+        height: 135,
+        margin: EdgeInsets.only(right: 16, bottom: 16, left: start ? 16 : 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: themeColor.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+              spreadRadius: -2,
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: themeColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                children: [
+                  _submissionDetailItem(
+                    Icons.copy_rounded,
+                    "Assignment #08",
+                    themeColor,
+                  ),
+                  const SizedBox(height: 8),
+                  _submissionDetailItem(
+                    Icons.person_outline_rounded,
+                    "Sir Ali",
+                    themeColor,
+                  ),
+                  const SizedBox(height: 8),
+                  _submissionDetailItem(
+                    Icons.timer_outlined,
+                    "12 Hours Left",
+                    themeColor,
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              children: [
-                _submissionDetailItem(
-                  Icons.copy_rounded,
-                  "Assignment #08",
-                  themeColor,
-                ),
-                const SizedBox(height: 8),
-                _submissionDetailItem(
-                  Icons.person_outline_rounded,
-                  "Sir Ali",
-                  themeColor,
-                ),
-                const SizedBox(height: 8),
-                _submissionDetailItem(
-                  Icons.timer_outlined,
-                  "12 Hours Left",
-                  themeColor,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

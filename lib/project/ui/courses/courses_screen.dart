@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_learn/project/ui/common/components/icon_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:flutter_learn/project/ui/coursedetail/CourseDetailScreen.dart';
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
 
@@ -94,7 +94,7 @@ class _CourseScreenState extends State<CourseScreen> {
         ),
         Stack(
           children: [
-            CustomIconButton(onBackPress: () {}),
+            CustomIconButton(),
             Positioned(
               right: 4,
               top: 0,
@@ -193,33 +193,42 @@ class _CourseScreenState extends State<CourseScreen> {
   }
 
   Widget _courseCard(Map<String, dynamic> course, bool isGrid) {
-    return Container(
-      margin: EdgeInsets.only(bottom: isGrid ? 0 : 16),
-      height: isGrid ? 60 : 125,
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CourseDetailScreen(course: course),
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: isGrid ? 0 : 16),
+        height: isGrid ? 60 : 125,
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
+          ],
+        ),
+        child: isGrid
+            ? Column(
+          children: [
+            _buildImage(course, true),
+            // Expanded(child: ),
+            _buildInfo(course, true),
+          ],
+        )
+            : Row(
+          spacing: 0,
+          children: [
+            _buildImage(course, false),
+            Expanded(child: _buildInfo(course, false)),
+          ],
+        ),
       ),
-      child: isGrid
-          ? Column(
-              children: [
-                _buildImage(course, true),
-
-                // Expanded(child: ),
-                _buildInfo(course, true),
-              ],
-            )
-          : Row(
-              spacing: 0,
-              children: [
-                _buildImage(course, false),
-                Expanded(child: _buildInfo(course, false)),
-              ],
-            ),
     );
   }
 
