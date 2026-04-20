@@ -1,8 +1,12 @@
 // lib/presentation/providers/auth_provider.dart
-import 'package:flutter_learn/project/core/errors/failure_dart.dart' show AuthFailure, ServerFailure;
-import 'package:flutter_learn/project/data/models/profile_model.dart' show ProfileModel;
-import 'package:flutter_learn/project/data/repositories/auth_repository.dart' show AuthRepository;
+import 'package:flutter_learn/project/core/errors/failure_dart.dart'
+    show AuthFailure, ServerFailure;
+import 'package:flutter_learn/project/data/models/profile_model.dart'
+    show ProfileModel;
+import 'package:flutter_learn/project/data/repositories/auth_repository.dart'
+    show AuthRepository;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 // Repository provider
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
@@ -16,14 +20,19 @@ class AuthState {
   final ProfileModel? profile;
   final String? errorMessage;
 
-  const AuthState({
-    required this.status,
-    this.profile,
-    this.errorMessage,
-  });
+  const AuthState({required this.status, this.profile, this.errorMessage});
 
   // Initial state
   factory AuthState.initial() => const AuthState(status: AuthStatus.initial);
+
+  String? get userId => profile?.id;
+
+  // ✅ ADD THIS: email getter
+  String? get email => profile?.email;
+
+  // ✅ ADD THIS: isAuthenticated check
+  bool get isAuthenticated =>
+      status == AuthStatus.authenticated && profile != null;
 
   AuthState copyWith({
     AuthStatus? status,
@@ -65,42 +74,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
         profile: profile,
       );
     } on AuthFailure catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
     } on ServerFailure catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
     }
   }
 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final profile = await _repository.login(
-        email: email,
-        password: password,
-      );
+      final profile = await _repository.login(email: email, password: password);
       state = state.copyWith(
         status: AuthStatus.authenticated,
         profile: profile,
       );
     } on AuthFailure catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
     } on ServerFailure catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
     }
   }
 
@@ -125,9 +116,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(status: AuthStatus.unauthenticated);
     }
   }
+  // ✅ ADD THIS: Method to update profile
+  void updateProfile(ProfileModel profile) {
+    if (state.status == AuthStatus.authenticated) {
+      state = state.copyWith(profile: profile);
+    }
+  }
+
+  // ✅ ADD THIS: Clear error
+  void clearError() {
+    state = state.copyWith(errorMessage: null);
+  }
 }
 
 // Provider
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(authRepositoryProvider));
+});
+
+final currentUserProvider = Provider<ProfileModel?>((ref) {
+  return ref.watch(authProvider).profile;
+});
+
+final isAuthenticatedProvider = Provider<bool>((ref) {
+  return ref.watch(authProvider).isAuthenticated;
+});
+
+final authStatusProvider = Provider<AuthStatus>((ref) {
+  return ref.watch(authProvider).status;
 });

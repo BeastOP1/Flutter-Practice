@@ -3,7 +3,7 @@ import '../common/components/icon_button.dart';
 
 class AssignmentUploadScreen extends StatelessWidget {
   final String title;
-  const AssignmentUploadScreen({super.key, required this.title});
+  const AssignmentUploadScreen({super.key, required this.title,  String assignmentId = ""});
 
   @override
   Widget build(BuildContext context) {

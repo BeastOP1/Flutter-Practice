@@ -1,78 +1,64 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/project/presentation/screens/common/components/icon_button.dart';
+import 'package:flutter_learn/project/data/models/course_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_learn/project/presentation/screens/coursedetail/CourseDetailScreen.dart';
-class CourseScreen extends StatefulWidget {
+import '../../providers/course_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../common/components/icon_button.dart';
+import 'course_detail_screen.dart';
+
+class CourseScreen extends ConsumerStatefulWidget {
   const CourseScreen({super.key});
 
   @override
-  State<CourseScreen> createState() => _CourseScreenState();
+  ConsumerState<CourseScreen> createState() => _CourseScreenState();
 }
 
-class _CourseScreenState extends State<CourseScreen> {
+class _CourseScreenState extends ConsumerState<CourseScreen> {
   bool isGridView = false;
+  final _searchController = TextEditingController();
 
-  final List<Map<String, dynamic>> courses = [
-    {
-      "code": "CS-RC0103",
-      "color": const Color(0xFF4C4D56),
-      "img": "assets/images/img_cs.png",
-    },
-    {
-      "code": "EE-RC0110",
-      "color": const Color(0xFFC04E2D),
-      "img": "assets/images/img_his.png",
-    },
-    {
-      "code": "MT-RC0120",
-      "color": const Color(0xFF7A813E),
-      "img": "assets/images/img_soft.png",
-    },
-    {
-      "code": "HU-RC0130",
-      "color": const Color(0xFFB06F23),
-      "img": "assets/images/img_his.png",
-    },
-    {
-      "code": "PH-RC0140",
-      "color": const Color(0xFF8A2373),
-      "img": "assets/images/img_math.png",
-    },
-    {
-      "code": "CH-RC0150",
-      "color": const Color(0xFF2D6A4F),
-      "img": "assets/images/img_his.png",
-    },
-    {
-      "code": "CS-AD9900",
-      "color": const Color(0xFF2D3250),
-      "img": "assets/images/img_cs.png",
-    },
-    {
-      "code": "EE-XT1122",
-      "color": const Color(0xFF7077A1),
-      "img": "assets/images/img_his.png",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(courseProvider.notifier).loadEnrolledCourses();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final courseState = ref.watch(courseProvider);
+    final authState = ref.watch(authProvider);
+
+    final courses = courseState.filteredCourses;
+    final isLoading = courseState.isLoading;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        // Bottom: false taake content bottom bar ke peeche tak jaye (Professional look)
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Column(
             spacing: 16,
             children: [
-              _buildHeader(),
+              _buildHeader(authState),
               _buildSearchRow(),
               Expanded(
-                // IndexedStack ya Simple condition for switching
-                child: isGridView ? _buildGridView() : _buildListView(),
+                child: isLoading
+                    ? _buildLoadingState()
+                    : courses.isEmpty
+                    ? _buildEmptyState()
+                    : isGridView
+                    ? _buildGridView(courses)
+                    : _buildListView(courses),
               ),
             ],
           ),
@@ -81,16 +67,24 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(authState) {
+    final userName = authState.profile?.fullName?.split(' ')[0] ?? 'Student';
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: Text(
-            "Available Courses",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Available Courses",
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "Welcome, $userName",
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+            ),
+          ],
         ),
         Stack(
           children: [
@@ -127,20 +121,30 @@ class _CourseScreenState extends State<CourseScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Color(0xfff3f3f3),
+              color: const Color(0xfff3f3f3),
               borderRadius: BorderRadius.circular(25),
             ),
             child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                ref.read(courseProvider.notifier).setSearchQuery(value);
+              },
               decoration: InputDecoration(
                 icon: SvgPicture.asset(
                   'assets/ic_search.svg',
-                  color: Color(0xff949494),
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xff949494),
+                    BlendMode.srcIn,
+                  ),
                   height: 22,
                   width: 22,
                 ),
                 hintText: "Search your Course Here",
                 border: InputBorder.none,
-                hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                hintStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ),
@@ -166,19 +170,17 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  Widget _buildListView() {
+  Widget _buildListView(List<CourseModel> courses) {
     return ListView.builder(
-      // Padding bottom 120 taake last item bottom bar ke peeche na chupe
       padding: const EdgeInsets.only(top: 10, bottom: 120),
-      physics: const BouncingScrollPhysics(), // Smooth scrolling effect
+      physics: const BouncingScrollPhysics(),
       itemCount: courses.length,
       itemBuilder: (context, index) => _courseCard(courses[index], false),
     );
   }
 
-  Widget _buildGridView() {
+  Widget _buildGridView(List<CourseModel> courses) {
     return GridView.builder(
-      // Same padding logic for Grid
       padding: const EdgeInsets.only(top: 10, bottom: 120),
       physics: const BouncingScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -192,56 +194,81 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  Widget _courseCard(Map<String, dynamic> course, bool isGrid) {
+  Widget _courseCard(CourseModel course, bool isGrid) {
+    final color = course.displayColor;
+    final imagePath = course.imageUrl ?? _getDefaultImage(course.department);
+
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CourseDetailScreen(course: course),
-          ),
-        );
+      onTap: () async {
+        // Load course details before navigating
+        await ref.read(courseProvider.notifier).loadCourseDetails(course.id);
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CourseDetailScreen(course: course),
+            ),
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.only(bottom: isGrid ? 0 : 16),
-        height: isGrid ? 60 : 125,
         clipBehavior: Clip.hardEdge,
+        height: isGrid ? null : 110,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+            ),
           ],
         ),
         child: isGrid
             ? Column(
           children: [
-            _buildImage(course, true),
-            // Expanded(child: ),
-            _buildInfo(course, true),
+            _buildImage(course, isGrid),
+            _buildInfo(course, color, isGrid),
           ],
         )
             : Row(
-          spacing: 0,
           children: [
-            _buildImage(course, false),
-            Expanded(child: _buildInfo(course, false)),
+            _buildImage(course, isGrid),
+            Expanded(child: _buildInfo(course, color, isGrid)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildImage(Map<String, dynamic> course, bool isGrid) {
+  Widget _buildImage(CourseModel course, bool isGrid) {
+    final imagePath = course.imageUrl ?? _getDefaultImage(course.department);
+
     return ClipRRect(
       borderRadius: isGrid
           ? const BorderRadius.vertical(top: Radius.circular(20))
           : const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
-            ),
-      child: Image.asset(
-        course['img'],
+        topLeft: Radius.circular(16),
+        bottomLeft: Radius.circular(16),
+      ),
+      child: course.imageUrl != null
+          ? Image.network(
+        course.imageUrl!,
+        width: isGrid ? double.infinity : 125,
+        height: isGrid ? 65 : double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(
+            imagePath,
+            width: isGrid ? double.infinity : 125,
+            height: isGrid ? 65 : double.infinity,
+            fit: BoxFit.cover,
+          );
+        },
+      )
+          : Image.asset(
+        imagePath,
         width: isGrid ? double.infinity : 125,
         height: isGrid ? 65 : double.infinity,
         fit: BoxFit.cover,
@@ -249,60 +276,61 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  Widget _buildInfo(Map<String, dynamic> course, bool isGrid) {
+  Widget _buildInfo(CourseModel course, Color color, bool isGrid) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isGrid ? 8 : 9,
         vertical: isGrid ? 12 : 16,
       ),
       decoration: BoxDecoration(
-        color: course['color'],
+        color: color,
         borderRadius: isGrid
             ? const BorderRadius.vertical(bottom: Radius.circular(20))
             : const BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
+          topRight: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "${course['code']}-S24-PB-DCL1",
+            course.code,
             maxLines: 1,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: isGrid ? 11 : 12,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const Text(
-            "PROGRAMMING FUNDAMENTALS (LAB)",
+          Text(
+            course.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
-            "Instructor: Hafiz Anas Ali",
-            style: TextStyle(color: Colors.white70, fontSize: 11),
+          Text(
+            "Instructor: ${course.instructorName ?? 'TBA'}",
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
             children: [
               Text(
-                "Credit Hour: 3",
+                "Credit: ${course.credits ?? 'N/A'}",
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
-
               SvgPicture.asset(
                 "assets/ic_fav.svg",
-                color: Colors.white,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
                 height: 20,
                 width: 20,
               ),
@@ -311,5 +339,63 @@ class _CourseScreenState extends State<CourseScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildLoadingState() {
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 10, bottom: 120),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          height: 125,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.book_outlined,
+            size: 64,
+            color: Colors.grey.shade400,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No courses found',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Enroll in courses to get started',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getDefaultImage(String? department) {
+    const images = {
+      'Computer Science': 'assets/images/img_cs.png',
+      'IT': 'assets/images/img_his.png',
+      'Software Engineering': 'assets/images/img_soft.png',
+      'Cyber Security': 'assets/images/img_math.png',
+    };
+    return images[department] ?? 'assets/images/img_cs.png';
   }
 }

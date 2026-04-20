@@ -11,3 +11,20 @@ class AuthFailure extends Failure {
 class ServerFailure extends Failure {
   const ServerFailure(super.message);
 }
+
+
+// Add these new failure types
+class NetworkFailure extends Failure {
+  final String message;
+  NetworkFailure({this.message = 'Network connection error'}) : super('');
+}
+
+class CacheFailure extends Failure {
+  final String message;
+  CacheFailure({this.message = 'Cache error'}) : super('');
+}
+
+class ValidationFailure extends Failure {
+  final String message;
+  ValidationFailure({this.message = 'Validation error'}) : super('');
+}
