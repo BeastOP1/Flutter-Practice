@@ -1,3 +1,4 @@
+// course_repository.dart
 import 'package:flutter_learn/project/core/errors/failure_dart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/course_model.dart';
@@ -19,29 +20,22 @@ class CourseRepository implements ICourseRepository {
   Future<List<CourseModel>> getEnrolledCourses(String studentId) async {
     try {
       final response = await _client
-          .from('course_enrollments')
-          .select('''
-          course_id,
-          courses!inner(
-            id, code, title, description, credits, 
-            image_url, department, syllabus_url, is_active,
-            course_instructors(
-              profiles(full_name)
-            )
-          )
-        ''')
-          .eq('student_id', studentId)
-          .eq('status', 'active');
+          .from('student_course_details')
+          .select()
+          .eq('student_id', studentId);
 
-      return response.map((json) {
-        final courseData = json['courses'] as Map<String, dynamic>;
-        final instructors = courseData['course_instructors'] as List?;
-
+      return response.map<CourseModel>((json) {
         return CourseModel.fromJson({
-          ...courseData,
-          'instructor_name': instructors?.isNotEmpty == true
-              ? instructors![0]['profiles']['full_name']
-              : 'Instructor TBA',
+          'id': json['id'],
+          'code': json['code'],
+          'title': json['title'],
+          'description': json['description'],
+          'credits': json['credits'],
+          'image_url': json['image_url'],
+          'department': json['department'],
+          'syllabus_url': json['syllabus_url'],
+          'is_active': json['is_active'],
+          'instructor_name': json['instructor_name'],
         });
       }).toList();
     } on PostgrestException catch (e) {
@@ -54,37 +48,37 @@ class CourseRepository implements ICourseRepository {
   @override
   Future<CourseModel?> getCourseDetails(String courseId, String studentId) async {
     try {
+      // For details, we can either use the same view with a course_id filter
+      // or create another view. Let's keep it simple: use the view + filter.
       final response = await _client
-          .from('courses')
-          .select('''
-          id, code, title, description, credits, 
-          image_url, department, syllabus_url, is_active,
-          course_instructors(
-            profiles(full_name)
-          ),
-          schedules(
-            location, room_number
-          )
-        ''')
-          .eq('id', courseId)
+          .from('student_course_details')
+          .select()
+          .eq('course_id', courseId)
+          .eq('student_id', studentId)
           .maybeSingle();
 
       if (response == null) return null;
 
-      final instructors = response['course_instructors'] as List?;
-      final schedules = response['schedules'] as List?;
+      // Also fetch schedules for location/room
+      final scheduleData = await _client
+          .from('schedules')
+          .select('location, room_number')
+          .eq('course_id', courseId)
+          .maybeSingle();
 
       return CourseModel.fromJson({
-        ...response,
-        'instructor_name': instructors?.isNotEmpty == true
-            ? instructors![0]['profiles']['full_name']
-            : 'Instructor TBA',
-        'location': schedules?.isNotEmpty == true
-            ? schedules![0]['location']
-            : null,
-        'room_number': schedules?.isNotEmpty == true
-            ? schedules![0]['room_number']
-            : null,
+        'id': response['id'],
+        'code': response['code'],
+        'title': response['title'],
+        'description': response['description'],
+        'credits': response['credits'],
+        'image_url': response['image_url'],
+        'department': response['department'],
+        'syllabus_url': response['syllabus_url'],
+        'is_active': response['is_active'],
+        'instructor_name': response['instructor_name'],
+        'location': scheduleData?['location'],
+        'room_number': scheduleData?['room_number'],
       });
     } on PostgrestException catch (e) {
       throw ServerFailure(e.message);
@@ -92,87 +86,10 @@ class CourseRepository implements ICourseRepository {
       throw NetworkFailure(message: e.toString());
     }
   }
-  // @override
-  // Future<List<CourseModel>> getEnrolledCourses(String studentId) async {
-  //   try {
-  //     final response = await _client
-  //         .from('course_enrollments')
-  //         .select('''
-  //           course_id,
-  //           courses!inner(
-  //             id, code, title, description, credits,
-  //             image_url, department, syllabus_url, is_active
-  //           ),
-  //           course_instructors!inner(
-  //             profiles!inner(full_name)
-  //           )
-  //         ''')
-  //         .eq('student_id', studentId)
-  //         .eq('status', 'active');
-  //
-  //     return response.map((json) {
-  //       final courseData = json['courses'] as Map<String, dynamic>;
-  //       final instructorData = json['course_instructors'] as List?;
-  //
-  //       return CourseModel.fromJson({
-  //         ...courseData,
-  //         'instructor_name': instructorData?.isNotEmpty == true
-  //             ? instructorData![0]['profiles']['full_name']
-  //             : null,
-  //       });
-  //     }).toList();
-  //   } on PostgrestException catch (e) {
-  //     throw ServerFailure( e.message);
-  //   } catch (e) {
-  //     throw NetworkFailure(message: e.toString());
-  //   }
-  // }
-  //
-  // @override
-  // Future<CourseModel?> getCourseDetails(String courseId, String studentId) async {
-  //   try {
-  //     final response = await _client
-  //         .from('courses')
-  //         .select('''
-  //           id, code, title, description, credits,
-  //           image_url, department, syllabus_url, is_active,
-  //           course_instructors(
-  //             profiles(full_name)
-  //           ),
-  //           schedules(
-  //             location, room_number
-  //           )
-  //         ''')
-  //         .eq('id', courseId)
-  //         .maybeSingle();
-  //
-  //     if (response == null) return null;
-  //
-  //     final schedules = response['schedules'] as List?;
-  //
-  //     return CourseModel.fromJson({
-  //       ...response,
-  //       'instructor_name': response['course_instructors']?.isNotEmpty == true
-  //           ? response['course_instructors'][0]['profiles']['full_name']
-  //           : null,
-  //       'location': schedules?.isNotEmpty == true
-  //           ? schedules![0]['location']
-  //           : null,
-  //       'room_number': schedules?.isNotEmpty == true
-  //           ? schedules![0]['room_number']
-  //           : null,
-  //     });
-  //   } on PostgrestException catch (e) {
-  //     throw ServerFailure( e.message);
-  //   } catch (e) {
-  //     throw NetworkFailure(message: e.toString());
-  //   }
-  // }
 
   @override
   Future<List<Map<String, dynamic>>> getCourseSyllabus(String courseId) async {
-    // For now, return static syllabus topics
-    // Later can be moved to a separate table
+    // Keep static for now; can be replaced with DB table later
     return [
       {'num': '01', 'title': 'Introduction to Programming'},
       {'num': '02', 'title': 'Control Flow & Loops'},
@@ -200,7 +117,7 @@ class CourseRepository implements ICourseRepository {
 
       return response;
     } on PostgrestException catch (e) {
-      throw ServerFailure( e.message);
+      throw ServerFailure(e.message);
     } catch (e) {
       throw NetworkFailure(message: e.toString());
     }

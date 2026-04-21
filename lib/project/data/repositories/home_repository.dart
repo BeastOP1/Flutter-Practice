@@ -9,11 +9,8 @@ import '../models/news_event_model.dart';
 
 abstract class IHomeRepository {
   Future<List<TodayClassModel>> getTodayClasses(String studentId);
-
   Future<List<AssignmentModel>> getTodayAssignments(String studentId);
-
   Future<List<NewsEventModel>> getNewsEvents();
-
   Future<List<CourseModel>> getEnrolledCourses(String studentId);
 }
 
@@ -21,19 +18,18 @@ class HomeRepository implements IHomeRepository {
   final SupabaseClient _client;
 
   HomeRepository({SupabaseClient? client})
-    : _client = client ?? Supabase.instance.client;
+      : _client = client ?? Supabase.instance.client;
 
   @override
   Future<List<TodayClassModel>> getTodayClasses(String studentId) async {
     try {
-      // Using your student_today_classes view
       final response = await _client
           .from('student_today_classes')
           .select()
           .eq('student_id', studentId)
           .order('start_time', ascending: true);
 
-      if (kDebugMode) print('✅ Classes: ${response}');
+      if (kDebugMode) print('✅ Classes: $response');
 
       return response.map((json) => TodayClassModel.fromJson(json)).toList();
     } on PostgrestException catch (e) {
@@ -48,34 +44,16 @@ class HomeRepository implements IHomeRepository {
     try {
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      if (kDebugMode) {
-        print('📤 RPC Call with: studentId=$studentId, today=$today');
-      }
-
-      // Using the RPC function we created
       final response = await _client.rpc(
         'get_student_today_assignments',
         params: {'student_id_param': studentId, 'today_date': today},
       );
 
-      if (kDebugMode) {
-        print('📥 RPC Response type: ${response.runtimeType}');
-        print(
-          '📥 RPC Response length: ${response is List ? response.length : 'not a list'}',
-        );
-      }
-      if (response == null) {
-        return [];
-      }
-
+      if (response == null) return [];
       if (response is List) {
         return response.map((json) => AssignmentModel.fromJson(json)).toList();
       }
-
-
-      return (response as List)
-          .map((json) => AssignmentModel.fromJson(json))
-          .toList();
+      return [];
     } on PostgrestException catch (e) {
       throw ServerFailure(e.message);
     } catch (e) {
@@ -104,28 +82,26 @@ class HomeRepository implements IHomeRepository {
   @override
   Future<List<CourseModel>> getEnrolledCourses(String studentId) async {
     try {
+      // ✅ Use the flat view that already includes instructor_name
       final response = await _client
-          .from('course_enrollments')
-          .select('''
-            course_id,
-            courses!inner(
-              id,
-              code,
-              title,
-              description,
-              credits,
-              image_url,
-              department
-            )
-          ''')
-          .eq('student_id', studentId)
-          .eq('status', 'active');
+          .from('student_course_details')
+          .select()
+          .eq('student_id', studentId);
 
-      if (kDebugMode) print('✅ Courses: ${response}');
+      if (kDebugMode) print('✅ Courses (with instructors): $response');
 
-      return response
-          .map((json) => CourseModel.fromJson(json['courses']))
-          .toList();
+      return response.map<CourseModel>((json) {
+        return CourseModel.fromJson({
+          'id': json['id'],
+          'code': json['code'],
+          'title': json['title'],
+          'description': json['description'],
+          'credits': json['credits'],
+          'image_url': json['image_url'],
+          'department': json['department'],
+          'instructor_name': json['instructor_name'], // 👈 now included
+        });
+      }).toList();
     } on PostgrestException catch (e) {
       throw ServerFailure(e.message);
     } catch (e) {

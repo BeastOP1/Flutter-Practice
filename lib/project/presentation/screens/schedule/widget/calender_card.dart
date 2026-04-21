@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_learn/project/core/utils/app_colors.dart';
 import '../models/class_model.dart';
@@ -31,8 +28,19 @@ class CalendarCard extends StatelessWidget {
   }
 
   String _monthName(int m) => const [
-    '', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    '',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ][m];
 
   @override
@@ -78,11 +86,7 @@ class CalendarCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        const Icon(
-          Icons.chevron_right,
-          color: AppColors.primary,
-          size: 20,
-        ),
+        const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
         const Spacer(),
         GestureDetector(
           onTap: onPrevMonth,
@@ -109,18 +113,20 @@ class CalendarCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: const ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-          .map((d) => SizedBox(
-        width: 36,
-        child: Text(
-          d,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ))
+          .map(
+            (d) => SizedBox(
+              width: 36,
+              child: Text(
+                d,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          )
           .toList(),
     );
   }
@@ -139,12 +145,13 @@ class CalendarCard extends StatelessWidget {
 
         final day = idx - offset + 1;
         final date = DateTime(focusedMonth.year, focusedMonth.month, day);
-        final isSelected = selectedDate.year == date.year &&
+        final isSelected =
+            selectedDate.year == date.year &&
             selectedDate.month == date.month &&
             selectedDate.day == date.day;
         final key = '${date.year}-${date.month}-${date.day}';
-        final hasEvents = scheduleCache.containsKey(key) &&
-            scheduleCache[key]!.isNotEmpty;
+        final hasEvents =
+            scheduleCache.containsKey(key) && scheduleCache[key]!.isNotEmpty;
 
         return _buildDateCell(date, isSelected, hasEvents);
       },
@@ -153,7 +160,8 @@ class CalendarCard extends StatelessWidget {
 
   Widget _buildDateCell(DateTime date, bool isSelected, bool hasEvents) {
     final today = DateTime.now();
-    final isToday = date.year == today.year &&
+    final isToday =
+        date.year == today.year &&
         date.month == today.month &&
         date.day == today.day;
 
