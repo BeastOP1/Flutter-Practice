@@ -1,4 +1,3 @@
-// lib/presentation/providers/auth_provider.dart
 import 'package:flutter_learn/project/core/errors/failure_dart.dart'
     show AuthFailure, ServerFailure;
 import 'package:flutter_learn/project/data/models/profile_model.dart'
@@ -27,10 +26,10 @@ class AuthState {
 
   String? get userId => profile?.id;
 
-  // ✅ ADD THIS: email getter
+  //  ADD THIS: email getter
   String? get email => profile?.email;
 
-  // ✅ ADD THIS: isAuthenticated check
+  //  ADD THIS: isAuthenticated check
   bool get isAuthenticated =>
       status == AuthStatus.authenticated && profile != null;
 
@@ -116,14 +115,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(status: AuthStatus.unauthenticated);
     }
   }
-  // ✅ ADD THIS: Method to update profile
+  //  ADD THIS: Method to update profile
   void updateProfile(ProfileModel profile) {
     if (state.status == AuthStatus.authenticated) {
       state = state.copyWith(profile: profile);
     }
   }
 
-  // ✅ ADD THIS: Clear error
+  //  ADD THIS: Clear error
   void clearError() {
     state = state.copyWith(errorMessage: null);
   }

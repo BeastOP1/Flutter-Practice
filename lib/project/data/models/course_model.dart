@@ -10,9 +10,9 @@ class CourseModel {
   final String? department;
   final String? syllabusUrl;
   final bool isActive;
-  final String? instructorName;  // ✅ Joined from course_instructors
-  final String? location;        // ✅ From schedules
-  final String? roomNumber;      // ✅ From schedules
+  final String? instructorName;  //  Joined from course_instructors
+  final String? location;        // From schedules
+  final String? roomNumber;      //  From schedules
 
   CourseModel({
     required this.id,
@@ -46,7 +46,7 @@ class CourseModel {
     );
   }
 
-  // ✅ For UI color generation
+
   Color get displayColor {
     final colors = [
       const Color(0xFF4C4D56),
@@ -61,6 +61,6 @@ class CourseModel {
     return colors[code.hashCode % colors.length];
   }
 
-  // ✅ For display
+
   String get displayCredits => credits != null ? '$credits Credits' : 'N/A';
 }

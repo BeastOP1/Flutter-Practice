@@ -69,8 +69,6 @@
 //   }
 // }
 
-
-
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_learn/project/core/errors/failure_dart.dart';
@@ -80,7 +78,7 @@ class ResultRepository {
   final SupabaseClient _client;
 
   ResultRepository({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   Future<List<ResultModel>> getResults(String studentId) async {
     try {
@@ -109,12 +107,12 @@ class ResultRepository {
           .select('semester')
           .eq('student_id', studentId)
           .not('semester', 'is', null);
-
-      final semesters = response
-          .map((e) => e['semester'] as String)
-          .toSet()
-          .toList()
-        ..sort((a, b) => b.compareTo(a)); // newest first
+      if (kDebugMode) {
+        print("Result ${response}");
+      }
+      final semesters =
+          response.map((e) => e['semester'] as String).toSet().toList()
+            ..sort((a, b) => b.compareTo(a)); // newest first
 
       return semesters;
     } on PostgrestException catch (e) {

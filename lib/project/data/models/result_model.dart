@@ -26,9 +26,10 @@ class ResultModel {
 
   factory ResultModel.fromJson(Map<String, dynamic> json) {
     final enrollment = json['course_enrollments'] as Map<String, dynamic>?;
-    final course     = enrollment?['courses']     as Map<String, dynamic>?
-        ?? json['courses']         as Map<String, dynamic>?
-        ?? json;
+    final course =
+        enrollment?['courses'] as Map<String, dynamic>? ??
+        json['courses'] as Map<String, dynamic>? ??
+        json;
 
     final instructors = course['course_instructors'] as List?;
     String? instructorName;
@@ -39,16 +40,16 @@ class ResultModel {
     } catch (_) {}
 
     return ResultModel(
-      id:            json['id']          as String,
-      courseId:      course['id']        as String? ?? '',
-      courseCode:    course['code']      as String? ?? '',
-      courseTitle:   course['title']     as String? ?? '',
-      faculty:       course['department'] as String?,
+      id: json['id'] as String,
+      courseId: course['id'] as String? ?? '',
+      courseCode: course['code'] as String? ?? '',
+      courseTitle: course['title'] as String? ?? '',
+      faculty: course['department'] as String?,
       instructorName: instructorName,
-      credits:       course['credits']   as int?,
-      finalGrade:    json['final_grade'] as String?,
-      finalScore:    (json['final_score'] as num?)?.toDouble(),
-      semester:      json['semester']    as String?,
+      credits: course['credits'] as int?,
+      finalGrade: json['final_grade'] as String?,
+      finalScore: (json['final_score'] as num?)?.toDouble(),
+      semester: json['semester'] as String?,
     );
   }
 }

@@ -1,24 +1,23 @@
-
+// lib/presentation/screens/profile/profile_screen.dart
 import 'package:flutter/material.dart';
-
+import 'package:flutter_learn/project/data/models/profile_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../common/components/icon_button.dart';
 import 'package:flutter_learn/project/presentation/screens/editprofile/EditProfileScreen.dart';
 import 'package:flutter_learn/project/presentation/screens/changepassword/ChangePasswordScreen.dart';
 import 'package:flutter_learn/project/presentation/screens/notificationdetail/NotificationScreen.dart';
 import 'package:flutter_learn/project/presentation/screens/auth/log_in_screen.dart';
 import 'package:flutter_learn/project/presentation/screens/help&support/SupportScreen.dart';
+import 'package:flutter_learn/project/presentation/providers/profile_provider.dart';
 
-
-
-
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
+class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with TickerProviderStateMixin {
   late AnimationController _headerCtrl;
   late AnimationController _cardsCtrl;
@@ -43,6 +42,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     Future.delayed(const Duration(milliseconds: 350), () {
       _cardsCtrl.forward();
     });
+
+    // ✅ Trigger profile fetch when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(profileProvider.notifier).fetchProfile();
+    });
   }
 
   @override
@@ -52,111 +56,113 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.dispose();
   }
 
-  // ── data ──────────────────────────────────────
-  static const _name = 'Hassan Farooq Siddiqi';
-  static const _rollNo = 'BSSE-5A | su92-bsse,-s24-099';
-  static const _dept = 'Software Engineering Dept';
-  static const _cgpa = 3.0;
-  static const _credits = 28;
-  static const _totalCredits = 50;
-  static const _semester = '5th';
-  static const _batch = '2025–2029';
-
   static const Color _primary = Color(0xFF8B3A8F);
   static const Color _accent = Color(0xFFB5860D);
   static const Color _bg = Color(0xFFF4F3F8);
 
-  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final profileState = ref.watch(profileProvider);
+    final isLoading = profileState.isLoading;
+    final error = profileState.errorMessage;
+    final profile = profileState.profile;
+
     return Scaffold(
       backgroundColor: _bg,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            FadeTransition(
-              opacity: _headerAnim,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                    begin: const Offset(0, -0.12), end: Offset.zero)
-                    .animate(_headerAnim),
-                child: _buildHeader(context),
-              ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : error != null
+          ? Center(child: Text('Error: $error'))
+          : profile == null
+          ? const Center(child: Text('No profile data'))
+          : _buildContent(profile),
+    );
+  }
+
+  Widget _buildContent(ProfileModel profile) {
+    final name = profile.fullName ?? 'Student';
+    final rollNo = profile.universityId ?? 'N/A';
+    final dept = profile.department ?? 'Computer Science';
+    final batch = profile.batch ?? '2025–2029';
+    final semester = '${profile.currentSemester ?? 1}th';
+    final cgpa = profile.cgpa.toStringAsFixed(2);
+    final creditsEarned = profile.creditsEarned;
+    final totalCredits = profile.totalCredits;
+    final passed = profile.passedCourses;
+    final failed = profile.failedCourses;
+    final pending = profile.pendingCourses;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        children: [
+          FadeTransition(
+            opacity: _headerAnim,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                  begin: const Offset(0, -0.12), end: Offset.zero)
+                  .animate(_headerAnim),
+              child: _buildHeader(context, name, rollNo, dept),
             ),
-
-            const SizedBox(height: 12),
-
-            // ── STATS ROW
-            FadeTransition(
-              opacity: _cardsAnim,
+          ),
+          const SizedBox(height: 12),
+          FadeTransition(
+            opacity: _cardsAnim,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _statsRow(cgpa, creditsEarned, totalCredits, semester),
+            ),
+          ),
+          const SizedBox(height: 20),
+          FadeTransition(
+            opacity: _cardsAnim,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                  begin: const Offset(0, 0.08), end: Offset.zero)
+                  .animate(_cardsAnim),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _statsRow(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ── INFO SECTION
-            FadeTransition(
-              opacity: _cardsAnim,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                    begin: const Offset(0, 0.08), end: Offset.zero)
-                    .animate(_cardsAnim),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _sectionLabel('Academic Info'),
-                      const SizedBox(height: 10),
-                      _infoCard(children: [
-                        _infoRow(Icons.badge_outlined,
-                            'Roll Number', 'su92-bssem-s24-099', _primary),
-                        _divider(),
-                        _infoRow(Icons.school_outlined, 'Batch',
-                            _batch, _accent),
-                        _divider(),
-                        _infoRow(Icons.layers_outlined, 'Current Semester',
-                            '$_semester Semester', _primary),
-                        _divider(),
-                        _infoRow(Icons.location_city_outlined, 'Campus',
-                            'Superior Gold Campus', _accent),
-                      ]),
-
-                      const SizedBox(height: 20),
-                      _sectionLabel('Performance'),
-                      const SizedBox(height: 10),
-                      _performanceCard(),
-
-                      const SizedBox(height: 20),
-                      _sectionLabel('Settings & More'),
-                      const SizedBox(height: 10),
-                      _menuCard(),
-
-                      const SizedBox(height: 30),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionLabel('Academic Info'),
+                    const SizedBox(height: 10),
+                    _infoCard(children: [
+                      _infoRow(Icons.badge_outlined, 'Roll Number', rollNo, _primary),
+                      _divider(),
+                      _infoRow(Icons.school_outlined, 'Batch', batch, _accent),
+                      _divider(),
+                      _infoRow(Icons.layers_outlined, 'Current Semester', semester, _primary),
+                      _divider(),
+                      _infoRow(Icons.location_city_outlined, 'Campus', 'Superior Gold Campus', _accent),
+                    ]),
+                    const SizedBox(height: 20),
+                    _sectionLabel('Performance'),
+                    const SizedBox(height: 10),
+                    _performanceCard(cgpa, creditsEarned, totalCredits, passed, failed, pending),
+                    const SizedBox(height: 20),
+                    _sectionLabel('Settings & More'),
+                    const SizedBox(height: 10),
+                    _menuCard(),
+                    const SizedBox(height: 30),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   // ── HERO HEADER ──────────────────────────────
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, String name, String rollNo, String dept) {
     final topPadding = MediaQuery.of(context).padding.top;
     return Container(
       height: 280 + topPadding,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // ── background gradient shape
           ClipPath(
             clipper: _HeaderClipper(),
             child: Container(
@@ -178,8 +184,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
             ),
           ),
-
-          // ── notification bell
           Positioned(
             top: topPadding + 14,
             right: 20,
@@ -198,8 +202,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               ],
             ),
           ),
-
-          // ── page title
           Positioned(
             top: topPadding + 20,
             left: 0,
@@ -208,8 +210,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               child: Text('Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white, letterSpacing: 0.3)),
             ),
           ),
-
-          // ── AVATAR SECTION (Wrapped with Navigation)
           Positioned(
             bottom: 0,
             left: 0,
@@ -259,16 +259,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(_name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+                Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
                 const SizedBox(height: 4),
-                Text(_rollNo, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                Text(rollNo, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.apartment_rounded, size: 16, color: _primary),
                     const SizedBox(width: 6),
-                    Text(_dept, style: TextStyle(fontSize: 11, color: _primary, fontWeight: FontWeight.w600)),
+                    Text(dept, style: TextStyle(fontSize: 11, color: _primary, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
@@ -279,22 +279,19 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _statsRow() {
+  Widget _statsRow(String cgpa, int creditsEarned, int totalCredits, String semester) {
     return Row(
       children: [
-        _statPill('CGPA', '$_cgpa', Icons.trending_up_rounded, _primary),
+        _statPill('CGPA', cgpa, Icons.trending_up_rounded, _primary),
         const SizedBox(width: 10),
-        _statPill('Credits', '$_credits/$_totalCredits',
-            Icons.star_outline_rounded, _accent),
+        _statPill('Credits', '$creditsEarned/$totalCredits', Icons.star_outline_rounded, _accent),
         const SizedBox(width: 10),
-        _statPill('Semester', _semester, Icons.layers_rounded,
-            const Color(0xFF2D5F8A)),
+        _statPill('Semester', semester, Icons.layers_rounded, const Color(0xFF2D5F8A)),
       ],
     );
   }
 
-  Widget _statPill(
-      String label, String value, IconData icon, Color color) {
+  Widget _statPill(String label, String value, IconData icon, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
@@ -432,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     child: Divider(height: 1, color: Colors.grey[100]),
   );
 
-  Widget _performanceCard() {
+  Widget _performanceCard(String cgpa, int earned, int total, int passed, int failed, int pending) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -463,7 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       color: Colors.white70,
                       fontSize: 12,
                       fontWeight: FontWeight.w500)),
-              Text('${_cgpa.toStringAsFixed(1)} / 4.0',
+              Text('$cgpa / 4.0',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
@@ -474,7 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: _cgpa / 4.0,
+              value: (double.tryParse(cgpa) ?? 0) / 4.0,
               minHeight: 7,
               backgroundColor: Colors.white.withOpacity(0.2),
               valueColor:
@@ -490,7 +487,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       color: Colors.white70,
                       fontSize: 12,
                       fontWeight: FontWeight.w500)),
-              Text('$_credits / $_totalCredits',
+              Text('$earned / $total',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
@@ -501,7 +498,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: _credits / _totalCredits,
+              value: earned / total,
               minHeight: 7,
               backgroundColor: Colors.white.withOpacity(0.2),
               valueColor:
@@ -511,11 +508,11 @@ class _ProfileScreenState extends State<ProfileScreen>
           const SizedBox(height: 16),
           Row(
             children: [
-              _miniStat('Passed', '10', Icons.check_circle_outline_rounded),
+              _miniStat('Passed', '$passed', Icons.check_circle_outline_rounded),
               _miniStatDivider(),
-              _miniStat('Failed', '0', Icons.cancel_outlined),
+              _miniStat('Failed', '$failed', Icons.cancel_outlined),
               _miniStatDivider(),
-              _miniStat('Pending', '3', Icons.hourglass_empty_rounded),
+              _miniStat('Pending', '$pending', Icons.hourglass_empty_rounded),
             ],
           ),
         ],
@@ -545,7 +542,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _miniStatDivider() => Container(
       width: 1, height: 36, color: Colors.white.withOpacity(0.15));
 
-  // ── MENU CARD ────────────────────────────────
   Widget _menuCard() {
     final items = [
       (Icons.notifications_outlined, 'Notifications', _primary),
@@ -595,7 +591,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                     : null,
                 dense: true,
                 onTap: () {
-                  // ── NAVIGATION LOGIC ──────────────────
                   switch (item.$2) {
                     case 'Notifications':
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen()));
@@ -607,7 +602,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const SupportScreen()));
                       break;
                     case 'Logout':
-                    // Logout ke liye hum replace use karte hain taake user back na aa sakay
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -628,7 +622,6 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
     );
   }
-
 
   Widget _decorCircle(double size, Color color) => Container(
     width: size,

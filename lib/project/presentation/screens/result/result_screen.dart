@@ -324,7 +324,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 7,
+                        fontSize: 16,
                       ),
                     ),
                   if (result.instructorName != null)
@@ -334,7 +334,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 7,
+                        fontSize: 16,
                       ),
                     ),
                   if (result.credits != null)
@@ -342,7 +342,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       'Credit Hours: ${result.credits}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 7,
+                        fontSize: 16,
                       ),
                     ),
                   if (result.semester != null)
@@ -352,7 +352,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 7,
+                        fontSize: 16,
                       ),
                     ),
                   const Spacer(),
@@ -360,11 +360,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 3,
+                        horizontal: 12, vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color:  Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
                           width: 0.5,
@@ -374,7 +374,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         'Result: ${result.finalGrade ?? 'N/A'}',
                         style: const TextStyle(
                           color:      Colors.white,
-                          fontSize:   11,
+                          fontSize:   16,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

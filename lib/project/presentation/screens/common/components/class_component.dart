@@ -32,7 +32,7 @@ class ClassComponent extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(
         left: 8,
-        right: 8, // Fixed: hamesha right margin ho
+        right: 8,
       ),
       width: 192,
       height: 130,
@@ -67,7 +67,7 @@ class ClassComponent extends StatelessWidget {
             Positioned(
               top: 8,
               right: 15,
-              left: 55,
+              left: 12,
               child: Text(
                 title,
                 textAlign: TextAlign.center,
@@ -128,8 +128,8 @@ class ClassComponent extends StatelessWidget {
                   height: 28,
                   width: 28,
                 ),
-                bottom: 16,
-                right: 16,
+                bottom: 32,
+                right: 8,
               ),
           ],
         ),

@@ -81,11 +81,11 @@ class _LMSNavBarState extends State<LMSNavBar> with TickerProviderStateMixin {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            // REMOVED spacing: 8.0  ← Ye line hata di
             children: List.generate(
               widget.items.length,
               (index) => _buildNavItem(index),
             ),
+
           ),
         );
       },
@@ -101,7 +101,6 @@ class _LMSNavBarState extends State<LMSNavBar> with TickerProviderStateMixin {
       onTap: () => _onTabChange(index),
       child: Container(
         height: 40,
-        // REMOVED fixed width constraints
         padding: const EdgeInsets.symmetric(horizontal: 8), // Reduced padding
         child: ScaleTransition(
           scale: Tween<double>(begin: 1.0, end: 1.1).animate(

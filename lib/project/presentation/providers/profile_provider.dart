@@ -1,58 +1,7 @@
+// lib/presentation/providers/profile_provider.dart (existing file)
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-class ProfileModel {
-  final String id;
-  final String email;
-  final String? fullName;
-  final String? avatarUrl;
-  final String role;
-  final String? universityId;
-  final String? phoneNumber;
-  final String? department;
-  final String? batch;
-  final int? currentSemester;
-  final int? maxCredits;
-
-  ProfileModel({
-    required this.id,
-    required this.email,
-    this.fullName,
-    this.avatarUrl,
-    required this.role,
-    this.universityId,
-    this.phoneNumber,
-    this.department,
-    this.batch,
-    this.currentSemester,
-    this.maxCredits,
-  });
-
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: json['full_name'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      role: json['role'] as String,
-      universityId: json['university_id'] as String?,
-      phoneNumber: json['phone_number'] as String?,
-      department: json['department'] as String?,
-      batch: json['batch'] as String?,
-      currentSemester: json['current_semester'] as int?,
-      maxCredits: json['max_credits'] as int?,
-    );
-  }
-
-  String get displayName {
-    if (fullName != null && fullName!.isNotEmpty) {
-      return fullName!.split(' ')[0];
-    }
-    return 'Student';
-  }
-
-  String get fullNameOrEmail => fullName ?? email;
-}
+import '../../data/models/profile_model.dart';   // adjust path
 
 class ProfileState {
   final ProfileModel? profile;
@@ -88,23 +37,38 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await Supabase.instance.client
+      // 1. Fetch basic profile
+      final profileResponse = await Supabase.instance.client
           .from('profiles')
           .select()
           .eq('id', userId)
           .maybeSingle();
 
-      if (response != null) {
-        state = state.copyWith(
-          profile: ProfileModel.fromJson(response),
-          isLoading: false,
-        );
-      } else {
+      if (profileResponse == null) {
         state = state.copyWith(
           errorMessage: 'Profile not found',
           isLoading: false,
         );
+        return;
       }
+
+      // 2. Fetch academic summary from view
+      final summaryResponse = await Supabase.instance.client
+          .from('student_academic_summary')
+          .select()
+          .eq('student_id', userId)
+          .maybeSingle();
+
+      // 3. Merge data into ProfileModel
+      final profile = ProfileModel.fromJson({
+        ...profileResponse,
+        if (summaryResponse != null) ...summaryResponse,
+      });
+
+      state = state.copyWith(
+        profile: profile,
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(
         errorMessage: e.toString(),
